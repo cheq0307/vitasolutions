@@ -1,4 +1,3 @@
-
 {{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
 <html lang="es">
@@ -47,16 +46,9 @@
             text-transform: uppercase; letter-spacing: 0.1em;
             padding: 0 16px; margin: 24px 0 8px;
         }
+        #sidebar { transition: transform 0.25s ease; }
+        #sidebar-overlay { transition: opacity 0.25s ease; }
 
-        /* Sidebar transition */
-        #sidebar {
-            transition: transform 0.25s ease;
-        }
-        #sidebar-overlay {
-            transition: opacity 0.25s ease;
-        }
-
-        /* Flash autohide */
         .flash-banner { animation: flashFade 4s ease forwards; }
         @keyframes flashFade {
             0%   { opacity: 1; transform: translateY(0); }
@@ -77,20 +69,29 @@
            class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col fixed top-0 left-0 z-30 -translate-x-full lg:translate-x-0"
            style="height: 100dvh">
 
-
         {{-- Logo --}}
         <div class="px-6 py-5 border-b border-slate-800 flex-shrink-0">
             <div class="flex items-center gap-3">
+                @php $center = auth()->user()->center; @endphp
+                @if($center && $center->logo_url)
+                <img src="{{ $center->logo_url }}" class="w-8 h-8 rounded-lg object-cover">
+                @else
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:#0F6E56">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                 </div>
-                <span class="font-semibold text-white text-lg">VitaSolutions</span>
-
-                {{-- Botón cerrar (solo móvil) --}}
-                <button onclick="closeSidebar()" class="ml-auto lg:hidden text-slate-400 hover:text-white">
+                @endif
+                <div class="flex-1 min-w-0">
+                    <span class="font-semibold text-white text-base truncate block">
+                        {{ $center ? $center->name : 'VitaSolutions' }}
+                    </span>
+                    @if(auth()->user()->isSuperAdmin())
+                    <span class="text-xs text-purple-400">Super Admin</span>
+                    @endif
+                </div>
+                <button onclick="closeSidebar()" class="ml-auto lg:hidden text-slate-400 hover:text-white flex-shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -100,8 +101,40 @@
 
         {{-- Navegación --}}
         <nav class="flex-1 px-3 py-4 overflow-y-auto min-h-0">
-            @if(auth()->user()->isAdmin())
 
+            @if(auth()->user()->isSuperAdmin())
+
+                {{-- SUPERADMIN --}}
+                <p class="sidebar-section">Super Admin</p>
+                <a href="{{ route('superadmin.dashboard') }}"
+                   class="sidebar-link {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Dashboard global
+                </a>
+
+                <p class="sidebar-section">Centros</p>
+                <a href="{{ route('superadmin.centers.index') }}"
+                   class="sidebar-link {{ request()->routeIs('superadmin.centers.*') ? 'active' : '' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Todos los centros
+                </a>
+                <a href="{{ route('superadmin.centers.create') }}"
+                   class="sidebar-link {{ request()->routeIs('superadmin.centers.create') ? 'active' : '' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Nuevo centro
+                </a>
+
+            @elseif(auth()->user()->isStrictAdmin())
+
+                {{-- ADMIN --}}
                 <p class="sidebar-section">General</p>
                 <a href="{{ route('admin.dashboard') }}"
                    class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -160,6 +193,7 @@
 
             @else
 
+                {{-- CLIENTE --}}
                 <p class="sidebar-section">Mi salud</p>
                 <a href="{{ route('cliente.dashboard') }}"
                    class="sidebar-link {{ request()->routeIs('cliente.dashboard') ? 'active' : '' }}">
@@ -224,7 +258,9 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
-                    <p class="text-xs text-slate-500">{{ auth()->user()->isAdmin() ? 'Administrador' : 'Cliente' }}</p>
+                    <p class="text-xs text-slate-500">
+                        {{ auth()->user()->isSuperAdmin() ? 'Super Administrador' : (auth()->user()->isStrictAdmin() ? 'Administrador' : 'Cliente') }}
+                    </p>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
@@ -243,10 +279,8 @@
     {{-- CONTENIDO PRINCIPAL --}}
     <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
 
-        {{-- Topbar --}}
         <header class="bg-slate-900/80 backdrop-blur border-b border-slate-800 px-4 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-20">
             <div class="flex items-center gap-3">
-                {{-- Botón hamburguesa (solo móvil) --}}
                 <button onclick="openSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -262,7 +296,6 @@
             <span class="text-xs lg:text-sm text-slate-500 hidden sm:block">{{ now()->isoFormat('D MMM YYYY') }}</span>
         </header>
 
-        {{-- Flash messages --}}
         @if(session('success'))
         <div class="flash-banner mx-4 lg:mx-8 mt-4 flex items-center gap-3 bg-teal-600/15 border border-teal-500/30 text-teal-300 px-4 py-3 rounded-xl text-sm font-medium">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,8 +334,8 @@
     @stack('scripts')
 
     <script>
-        const sidebar  = document.getElementById('sidebar');
-        const overlay  = document.getElementById('sidebar-overlay');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
 
         function openSidebar() {
             sidebar.classList.remove('-translate-x-full');
@@ -321,7 +354,6 @@
             document.body.style.overflow = '';
         }
 
-        // Cerrar al navegar en móvil
         document.querySelectorAll('.sidebar-link').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth < 1024) closeSidebar();

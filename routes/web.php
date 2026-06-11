@@ -13,7 +13,8 @@ use App\Http\Controllers\Cliente\MedicionController;
 use App\Http\Controllers\Cliente\ProtocoloController;
 use App\Http\Controllers\Cliente\CuestionarioController;
 use App\Http\Controllers\Cliente\ArchivoController;
-
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
+ use App\Http\Controllers\SuperAdmin\CenterController;
 // ── Raíz ──────────────────────────────────────────────────────────────────────
 Route::get('/', function () {
     if (auth()->check()) {
@@ -32,8 +33,18 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])
      ->middleware('auth')->name('logout');
 
+     // Grupo superadmin (agregar ANTES del grupo admin):
+
+Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('/dashboard', [SuperAdminDashboard::class, 'index'])->name('dashboard');
+    Route::resource('centers', CenterController::class);
+    Route::post('centers/{center}/assign-admin', [CenterController::class, 'assignAdmin'])->name('centers.assign-admin');
+});
+
+
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::post('productos/{producto}/importar', [ProductoController::class, 'importSugerido'])->name('productos.importar');
 
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
 

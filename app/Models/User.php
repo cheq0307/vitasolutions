@@ -4,21 +4,63 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = ['name', 'email', 'phone', 'password', 'role', 'active'];
-    protected $hidden   = ['password', 'remember_token'];
-    protected $casts    = ['active' => 'boolean'];
+    protected $fillable = [
+        'name', 'email', 'password', 'role', 'center_id', 'phone', 'active',
+    ];
 
-    public function healthProfile()  { return $this->hasOne(HealthProfile::class); }
-    public function healthFiles()    { return $this->hasMany(HealthFile::class); }
-    public function deviceReadings() { return $this->hasMany(DeviceReading::class); }
-    public function protocols()      { return $this->hasMany(UserProtocol::class); }
-    public function surveys()        { return $this->hasMany(WellnessSurvey::class); }
+    protected $hidden = ['password', 'remember_token'];
 
-    public function isAdmin(): bool  { return $this->role === 'admin'; }
-    public function isClient(): bool { return $this->role === 'client'; }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+        'active'            => 'boolean',
+    ];
+
+    // ── Relaciones ──────────────────────────────────────────────────────────
+
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class);
+    }
+
+    public function healthProfile(): HasOne
+    {
+        return $this->hasOne(HealthProfile::class);
+    }
+
+    public function clientPlans(): HasMany
+    {
+        return $this->hasMany(ClientPlan::class);
+    }
+
+    // ── Helpers de rol ──────────────────────────────────────────────────────
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    public function isAdmin(): bool
+    {
+        // superadmin también tiene permisos de admin
+        return in_array($this->role, ['admin', 'superadmin']);
+    }
+
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
+    }
+
+    public function isStrictAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 }
