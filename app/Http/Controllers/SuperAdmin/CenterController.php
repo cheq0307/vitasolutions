@@ -12,7 +12,8 @@ class CenterController extends Controller
 {
     public function index()
     {
-        $centers = Center::withCount(['admins', 'clients', 'products', 'plans'])
+        $centers = Center::with('owner')
+            ->withCount(['admins', 'clients', 'products', 'plans'])
             ->latest()
             ->paginate(15);
 
@@ -27,13 +28,12 @@ class CenterController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'      => 'required|string|max:120',
-            'address'   => 'nullable|string|max:200',
-            'phone'     => 'nullable|string|max:20',
-            'email'     => 'nullable|email|max:120',
-            'logo_url'  => 'nullable|url|max:500',
-            'active'    => 'boolean',
-            // Admin inicial del centro (opcional)
+            'name'           => 'required|string|max:120',
+            'address'        => 'nullable|string|max:200',
+            'phone'          => 'nullable|string|max:20',
+            'email'          => 'nullable|email|max:120',
+            'logo_url'       => 'nullable|url|max:500',
+            'active'         => 'boolean',
             'admin_name'     => 'nullable|string|max:120',
             'admin_email'    => 'nullable|email|unique:users,email',
             'admin_password' => 'nullable|string|min:6',
@@ -48,9 +48,9 @@ class CenterController extends Controller
             'active'   => $request->boolean('active', true),
         ]);
 
-        // Crear admin inicial si se proporcionó
+        // Crear admin owner inicial si se proporcionó
         if ($request->filled('admin_email')) {
-            User::create([
+            $owner = User::create([
                 'name'      => $request->admin_name,
                 'email'     => $request->admin_email,
                 'password'  => Hash::make($request->admin_password),
@@ -58,6 +58,9 @@ class CenterController extends Controller
                 'center_id' => $center->id,
                 'active'    => true,
             ]);
+
+            // Asignar como owner del centro
+            $center->update(['owner_id' => $owner->id]);
         }
 
         return redirect()->route('superadmin.centers.index')
@@ -66,7 +69,7 @@ class CenterController extends Controller
 
     public function show(Center $center)
     {
-        $center->load(['admins', 'clients']);
+        $center->load(['owner', 'admins', 'clients']);
         $stats = [
             'admins'   => $center->admins()->count(),
             'clients'  => $center->clients()->count(),
@@ -74,11 +77,15 @@ class CenterController extends Controller
             'plans'    => $center->plans()->count(),
         ];
 
-        return view('superadmin.centers.show', compact('center', 'stats'));
+        // Admins disponibles para asignar como owner (admins del centro sin ser owner)
+        $adminsDisponibles = $center->admins()->where('id', '!=', $center->owner_id)->get();
+
+        return view('superadmin.centers.show', compact('center', 'stats', 'adminsDisponibles'));
     }
 
     public function edit(Center $center)
     {
+        $center->load('admins');
         return view('superadmin.centers.edit', compact('center'));
     }
 
@@ -91,6 +98,7 @@ class CenterController extends Controller
             'email'    => 'nullable|email|max:120',
             'logo_url' => 'nullable|url|max:500',
             'active'   => 'boolean',
+            'owner_id' => 'nullable|exists:users,id',
         ]);
 
         $center->update([
@@ -100,6 +108,7 @@ class CenterController extends Controller
             'email'    => $request->email,
             'logo_url' => $request->logo_url,
             'active'   => $request->boolean('active', true),
+            'owner_id' => $request->owner_id,
         ]);
 
         return redirect()->route('superadmin.centers.index')
@@ -108,9 +117,8 @@ class CenterController extends Controller
 
     public function destroy(Center $center)
     {
-        $clientCount = $center->clients()->count();
-        if ($clientCount > 0) {
-            return back()->with('error', "No se puede eliminar: el centro tiene {$clientCount} cliente(s) activo(s).");
+        if ($center->clients()->count() > 0) {
+            return back()->with('error', "No se puede eliminar: el centro tiene {$center->clients()->count()} cliente(s) activo(s).");
         }
 
         $center->delete();
@@ -118,18 +126,42 @@ class CenterController extends Controller
             ->with('success', 'Centro eliminado.');
     }
 
-    // Asignar admin existente a un centro
-    public function assignAdmin(Request $request, Center $center)
+    /**
+     * Asignar un admin existente del centro como owner.
+     * Solo el superadmin puede hacer esto.
+     */
+    public function assignOwner(Request $request, Center $center)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'owner_id' => 'required|exists:users,id',
         ]);
 
-        User::findOrFail($request->user_id)->update([
-            'center_id' => $center->id,
-            'role'      => 'admin',
-        ]);
+        $user = User::findOrFail($request->owner_id);
 
-        return back()->with('success', 'Administrador asignado correctamente.');
+        // Verificar que el usuario pertenece al centro
+        if ($user->center_id !== $center->id) {
+            return back()->with('error', 'El usuario no pertenece a este centro.');
+        }
+
+        $center->update(['owner_id' => $user->id]);
+
+        return back()->with('success', "{$user->name} ahora es el admin owner de {$center->name}.");
+    }
+
+    /**
+     * Deshabilitar un admin del centro.
+     * El superadmin puede deshabilitar a cualquiera.
+     */
+    public function toggleAdmin(Request $request, Center $center, User $user)
+    {
+        // No se puede deshabilitar al superadmin
+        if ($user->isSuperAdmin()) {
+            return back()->with('error', 'No se puede deshabilitar al superadmin.');
+        }
+
+        $user->update(['active' => !$user->active]);
+        $estado = $user->active ? 'habilitado' : 'deshabilitado';
+
+        return back()->with('success', "{$user->name} ha sido {$estado}.");
     }
 }

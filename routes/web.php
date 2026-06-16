@@ -16,7 +16,6 @@ use App\Http\Controllers\Cliente\ArchivoController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
  use App\Http\Controllers\SuperAdmin\CenterController;
 
- 
 // ── Raíz ──────────────────────────────────────────────────────────────────────
 Route::get('/', function () {
     if (auth()->check()) {

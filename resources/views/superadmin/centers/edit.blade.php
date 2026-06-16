@@ -47,6 +47,23 @@
             </div>
         </div>
 
+        {{-- Owner del centro --}}
+        @if($center->admins->isNotEmpty())
+        <div>
+            <label class="block text-slate-300 text-sm font-medium mb-1">Admin Owner</label>
+            <select name="owner_id"
+                class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
+                <option value="">— Sin owner asignado —</option>
+                @foreach($center->admins as $admin)
+                <option value="{{ $admin->id }}" {{ old('owner_id', $center->owner_id) == $admin->id ? 'selected' : '' }}>
+                    {{ $admin->name }} — {{ $admin->email }}
+                </option>
+                @endforeach
+            </select>
+            <p class="text-slate-500 text-xs mt-1">El owner puede editar el centro y gestionar asesores staff.</p>
+        </div>
+        @endif
+
         <div class="flex items-center justify-between pt-1">
             <span class="text-slate-300 text-sm font-medium">Centro activo</span>
             <label class="relative inline-flex items-center cursor-pointer">
@@ -63,7 +80,7 @@
             style="background:#0F6E56">
             Guardar cambios
         </button>
-        <a href="{{ route('superadmin.centers.index') }}"
+        <a href="{{ route('superadmin.centers.show', $center) }}"
            class="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition">
             Cancelar
         </a>
@@ -77,12 +94,8 @@
 document.getElementById('logo-url').addEventListener('input', function() {
     const preview = document.getElementById('logo-preview');
     const img = document.getElementById('logo-img');
-    if (this.value) {
-        img.src = this.value;
-        preview.classList.remove('hidden');
-    } else {
-        preview.classList.add('hidden');
-    }
+    if (this.value) { img.src = this.value; preview.classList.remove('hidden'); }
+    else { preview.classList.add('hidden'); }
 });
 </script>
 @endpush

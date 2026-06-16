@@ -54,13 +54,35 @@ class User extends Authenticatable
         return in_array($this->role, ['admin', 'superadmin']);
     }
 
+    public function isStrictAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
     public function isClient(): bool
     {
         return $this->role === 'client';
     }
 
-    public function isStrictAdmin(): bool
+    /**
+     * Verifica si el usuario es el admin owner de su centro.
+     * El owner es quien tiene su id como owner_id en la tabla centers.
+     */
+    public function isOwner(): bool
     {
-        return $this->role === 'admin';
+        if (!$this->isStrictAdmin() || !$this->center_id) {
+            return false;
+        }
+
+        return $this->center && $this->center->owner_id === $this->id;
+    }
+
+    /**
+     * Verifica si el usuario es admin staff (no owner).
+     * Los staff son admins de un centro pero no el dueño.
+     */
+    public function isStaff(): bool
+    {
+        return $this->isStrictAdmin() && !$this->isOwner();
     }
 }
