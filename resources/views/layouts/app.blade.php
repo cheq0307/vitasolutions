@@ -89,6 +89,8 @@
                     </span>
                     @if(auth()->user()->isSuperAdmin())
                     <span class="text-xs text-purple-400">Super Admin</span>
+                    @elseif(auth()->user()->isOwner())
+                    <span class="text-xs text-teal-400">Admin Owner</span>
                     @endif
                 </div>
                 <button onclick="closeSidebar()" class="ml-auto lg:hidden text-slate-400 hover:text-white flex-shrink-0">
@@ -191,6 +193,16 @@
                     Suscripciones activas
                 </a>
 
+                <p class="sidebar-section">Mi Centro</p>
+                <a href="{{ route('admin.centro.show') }}"
+                   class="sidebar-link {{ request()->routeIs('admin.centro.*') ? 'active' : '' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Mi centro
+                </a>
+
             @else
 
                 {{-- CLIENTE --}}
@@ -259,7 +271,15 @@
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
                     <p class="text-xs text-slate-500">
-                        {{ auth()->user()->isSuperAdmin() ? 'Super Administrador' : (auth()->user()->isStrictAdmin() ? 'Administrador' : 'Cliente') }}
+                        @if(auth()->user()->isSuperAdmin())
+                            Super Administrador
+                        @elseif(auth()->user()->isOwner())
+                            Admin Owner
+                        @elseif(auth()->user()->isStrictAdmin())
+                            Administrador
+                        @else
+                            Cliente
+                        @endif
                     </p>
                 </div>
             </div>
