@@ -18,12 +18,12 @@ class Product extends Model
         'price',
         'image_url',
         'image_path',   // ← nuevo: ruta local
-        'is_active',
+        'active',
         'is_suggested',
     ];
 
     protected $casts = [
-        'is_active'    => 'boolean',
+        'active'       => 'boolean',
         'is_suggested' => 'boolean',
         'price'        => 'decimal:2',
     ];
@@ -48,7 +48,7 @@ class Product extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('active', true);
     }
 
     public function scopeForCenter($query, int $centerId)

@@ -56,7 +56,7 @@ class ProductoController extends Controller
         ]);
 
         $data['center_id'] = Auth::user()->center_id;
-        $data['is_active'] = $request->boolean('is_active', true);
+        $data['active'] = $request->boolean('is_active', true);
 
         // Imagen: archivo local tiene prioridad sobre URL
         if ($request->hasFile('image_file')) {
@@ -106,7 +106,7 @@ class ProductoController extends Controller
             'is_active'   => 'boolean',
         ]);
 
-        $data['is_active'] = $request->boolean('is_active');
+        $data['active'] = $request->boolean('is_active');
 
         // Lógica de imagen
         if ($request->hasFile('image_file')) {
@@ -145,7 +145,7 @@ class ProductoController extends Controller
     public function toggle(Product $producto)
     {
         $this->authorizeCenter($producto);
-        $producto->update(['is_active' => !$producto->is_active]);
+        $producto->update(['active' => !$producto->active]);
         return back()->with('success', 'Estado del producto actualizado.');
     }
 
