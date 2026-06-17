@@ -55,6 +55,28 @@
             80%  { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-6px); pointer-events: none; }
         }
+
+        /* Inputs legibles sobre fondo oscuro */
+        input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+        select,
+        textarea {
+            background-color: #1e293b !important;
+            color: #f1f5f9 !important;
+            border-color: #334155 !important;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #64748b !important;
+        }
+
+        input:focus:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+        select:focus,
+        textarea:focus {
+            border-color: #0F6E56 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(15, 110, 86, 0.3) !important;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex">
