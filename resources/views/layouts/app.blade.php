@@ -56,18 +56,18 @@
             100% { opacity: 0; transform: translateY(-6px); pointer-events: none; }
         }
 
-        /* Inputs legibles sobre fondo oscuro */
+        /* Inputs tema oscuro */
         input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
         select,
         textarea {
-            background-color: #1e293b !important;
-            color: #f1f5f9 !important;
-            border-color: #334155 !important;
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+            border-color: #1e293b !important;
         }
 
         input::placeholder,
         textarea::placeholder {
-            color: #64748b !important;
+            color: #475569 !important;
         }
 
         input:focus:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
@@ -75,7 +75,7 @@
         textarea:focus {
             border-color: #0F6E56 !important;
             outline: none !important;
-            box-shadow: 0 0 0 2px rgba(15, 110, 86, 0.3) !important;
+            box-shadow: 0 0 0 2px rgba(15, 110, 86, 0.25) !important;
         }
     </style>
 </head>
