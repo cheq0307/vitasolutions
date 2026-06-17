@@ -3,147 +3,125 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Center;
 use App\Models\User;
+use App\Services\ImageUploadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class CenterController extends Controller
 {
-    /**
-     * Obtiene el centro del admin autenticado.
-     */
-    private function myCenter()
-    {
-        return auth()->user()->center;
-    }
+    public function __construct(protected ImageUploadService $imageService) {}
 
-    /**
-     * Vista del centro — disponible para owner y staff.
-     */
+    // ─── Ver / editar el propio centro (owner) ────────────────────────────────
+
     public function show()
     {
-        $center = $this->myCenter();
-
-        if (!$center) {
-            return redirect()->route('admin.dashboard')
-                ->with('error', 'No tienes un centro asignado.');
-        }
-
-        $center->load(['owner', 'admins', 'clients']);
-        $isOwner = auth()->user()->isOwner();
-
-        return view('admin.centro.show', compact('center', 'isOwner'));
-    }
-
-    /**
-     * Formulario de edición del centro — solo para el owner.
-     */
-    public function edit()
-    {
-        $this->authorizeOwner();
-        $center = $this->myCenter();
-
+        $center = $this->getOwnCenter();
         return view('admin.centro.edit', compact('center'));
     }
 
-    /**
-     * Actualizar información del centro — solo para el owner.
-     */
     public function update(Request $request)
     {
-        $this->authorizeOwner();
-        $center = $this->myCenter();
+        $center = $this->getOwnCenter();
 
-        $request->validate([
-            'name'     => 'required|string|max:120',
-            'address'  => 'nullable|string|max:200',
-            'phone'    => 'nullable|string|max:20',
-            'email'    => 'nullable|email|max:120',
-            'logo_url' => 'nullable|url|max:500',
+        $data = $request->validate([
+            'name'        => 'required|string|max:150',
+            'address'     => 'nullable|string|max:300',
+            'phone'       => 'nullable|string|max:30',
+            'email'       => 'nullable|email|max:150',
+            'logo'        => 'nullable|url|max:500',
+            'logo_file'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_logo' => 'boolean',
         ]);
 
-        $center->update([
-            'name'     => $request->name,
-            'address'  => $request->address,
-            'phone'    => $request->phone,
-            'email'    => $request->email,
-            'logo_url' => $request->logo_url,
-        ]);
+        // Lógica de logo (misma que en SuperAdmin)
+        if ($request->hasFile('logo_file')) {
+            $data['logo_path'] = $this->imageService->replace(
+                $request->file('logo_file'),
+                $center->logo_path,
+                'centers'
+            );
+            $data['logo'] = null;
+
+        } elseif ($request->boolean('remove_logo')) {
+            $this->imageService->delete($center->logo_path);
+            $data['logo_path'] = null;
+            $data['logo']      = null;
+
+        } elseif (!empty($data['logo'])) {
+            $this->imageService->delete($center->logo_path);
+            $data['logo_path'] = null;
+
+        } else {
+            unset($data['logo']);
+        }
+
+        $center->update($data);
 
         return redirect()->route('admin.centro.show')
-            ->with('success', 'Información del centro actualizada.');
+                         ->with('success', 'Centro actualizado correctamente.');
     }
 
-    /**
-     * Crear un nuevo admin staff en el centro — solo owner.
-     */
+    // ─── Gestión de staff ─────────────────────────────────────────────────────
+
     public function createStaff()
     {
-        $this->authorizeOwner();
         return view('admin.centro.create-staff');
     }
 
     public function storeStaff(Request $request)
     {
-        $this->authorizeOwner();
+        $center = $this->getOwnCenter();
 
-        $request->validate([
-            'name'     => 'required|string|max:120',
+        $data = $request->validate([
+            'name'     => 'required|string|max:150',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
+            'name'      => $data['name'],
+            'email'     => $data['email'],
+            'password'  => Hash::make($data['password']),
             'role'      => 'admin',
-            'center_id' => $this->myCenter()->id,
+            'center_id' => $center->id,
             'active'    => true,
         ]);
 
         return redirect()->route('admin.centro.show')
-            ->with('success', "Admin \"{$request->name}\" creado correctamente.");
+                         ->with('success', 'Asesor creado correctamente.');
     }
 
-    /**
-     * Habilitar / deshabilitar un admin staff — solo owner.
-     * El owner NO puede deshabilitarse a sí mismo.
-     */
     public function toggleStaff(User $user)
     {
-        $this->authorizeOwner();
-        $center = $this->myCenter();
+        $center = $this->getOwnCenter();
 
-        // Verificar que el usuario pertenece al mismo centro
-        if ($user->center_id !== $center->id) {
-            abort(403);
-        }
+        // Solo puede modificar usuarios de su propio centro
+        abort_if($user->center_id !== $center->id, 403);
 
-        // El owner no puede deshabilitarse a sí mismo
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'No puedes deshabilitarte a ti mismo.');
-        }
+        // No puede deshabilitarse a sí mismo
+        abort_if($user->id === Auth::id(), 403, 'No puedes deshabilitarte a ti mismo.');
 
-        // El owner no puede deshabilitar a otro owner
-        // (solo el superadmin puede hacerlo)
-        if ($center->isOwnedBy($user)) {
-            return back()->with('error', 'Solo el superadmin puede deshabilitar al admin owner.');
-        }
+        // No puede deshabilitar a otro owner (solo superadmin puede)
+        abort_if($center->owner_id === $user->id && $user->id !== Auth::id(), 403);
 
         $user->update(['active' => !$user->active]);
-        $estado = $user->active ? 'habilitado' : 'deshabilitado';
 
-        return back()->with('success', "{$user->name} ha sido {$estado}.");
+        return back()->with('success', 'Estado del asesor actualizado.');
     }
 
-    /**
-     * Verifica que el usuario autenticado es owner de su centro.
-     */
-    private function authorizeOwner(): void
+    // ─── Helper privado ───────────────────────────────────────────────────────
+
+    private function getOwnCenter(): Center
     {
-        if (!auth()->user()->isOwner() && !auth()->user()->isSuperAdmin()) {
-            abort(403, 'Solo el admin owner puede realizar esta acción.');
-        }
+        $user = Auth::user();
+
+        // Verificar que el usuario autenticado es owner de un centro
+        $center = Center::where('owner_id', $user->id)->first();
+        abort_if(!$center, 403, 'No tienes un centro asignado como owner.');
+
+        return $center;
     }
 }

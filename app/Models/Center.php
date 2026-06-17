@@ -3,66 +3,50 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\HasImageUrl;
 
 class Center extends Model
 {
+    use HasImageUrl;
+
     protected $fillable = [
-        'name', 'address', 'phone', 'email', 'logo_url', 'active', 'owner_id',
+        'name',
+        'address',
+        'phone',
+        'email',
+        'logo',         // URL externa (legacy)
+        'logo_path',    // ← nuevo: ruta local
+        'owner_id',
+        'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
     ];
 
-    // ── Relaciones ──────────────────────────────────────────────────────────
+    // Override de los campos del trait para que use logo_path / logo
+    protected string $imagePathField = 'logo_path';
+    protected string $imageUrlField  = 'logo';
 
-    public function owner(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'owner_id');
-    }
+    // ─── Relaciones ──────────────────────────────────────────────────────────
 
-    public function users(): HasMany
+    public function users()
     {
         return $this->hasMany(User::class);
     }
 
-    public function admins(): HasMany
+    public function owner()
     {
-        return $this->hasMany(User::class)->where('role', 'admin');
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function clients(): HasMany
-    {
-        return $this->hasMany(User::class)->where('role', 'client');
-    }
-
-    public function products(): HasMany
+    public function products()
     {
         return $this->hasMany(Product::class);
     }
 
-    public function plans(): HasMany
+    public function plans()
     {
         return $this->hasMany(Plan::class);
-    }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    /**
-     * Logo: si no tiene, retorna null y la vista usa el logo de VitaSolutions.
-     */
-    public function getLogoAttribute(): ?string
-    {
-        return $this->logo_url ?: null;
-    }
-
-    /**
-     * Verifica si un usuario es el owner de este centro.
-     */
-    public function isOwnedBy(User $user): bool
-    {
-        return $this->owner_id === $user->id;
     }
 }

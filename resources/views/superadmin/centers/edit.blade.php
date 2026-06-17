@@ -1,102 +1,118 @@
 @extends('layouts.app')
 
-@section('title', 'Editar centro')
-@section('subtitle', $center->name)
+@section('title', 'Editar Centro')
 
 @section('content')
-<div class="max-w-2xl">
-<form method="POST" action="{{ route('superadmin.centers.update', $center) }}">
-@csrf @method('PUT')
+<div class="max-w-2xl mx-auto py-8 px-4">
 
-<div class="space-y-5">
-
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
-        <h2 class="text-white font-semibold text-sm uppercase tracking-wider">Información del centro</h2>
-
+    {{-- Header --}}
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{{ route('superadmin.centers.show', $center) }}"
+           class="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
         <div>
-            <label class="block text-slate-300 text-sm font-medium mb-1">Nombre *</label>
-            <input type="text" name="name" value="{{ old('name', $center->name) }}" required
-                class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
+            <h1 class="text-xl font-bold text-gray-900">Editar Centro</h1>
+            <p class="text-sm text-gray-500">{{ $center->name }}</p>
         </div>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form action="{{ route('superadmin.centers.update', $center) }}" method="POST"
+          enctype="multipart/form-data" class="space-y-6">
+        @csrf
+        @method('PUT')
+
+        {{-- Datos del centro --}}
+        <div class="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+            <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Datos del centro</h2>
+
             <div>
-                <label class="block text-slate-300 text-sm font-medium mb-1">Teléfono</label>
-                <input type="text" name="phone" value="{{ old('phone', $center->phone) }}"
-                    class="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="name" value="{{ old('name', $center->name) }}" required
+                       class="w-full rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500">
+                @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
+
             <div>
-                <label class="block text-slate-300 text-sm font-medium mb-1">Correo</label>
-                <input type="email" name="email" value="{{ old('email', $center->email) }}"
-                    class="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                <input type="text" name="address" value="{{ old('address', $center->address) }}"
+                       class="w-full rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" name="phone" value="{{ old('phone', $center->phone) }}"
+                           class="w-full rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email del centro</label>
+                    <input type="email" name="email" value="{{ old('email', $center->email) }}"
+                           class="w-full rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="hidden" name="active" value="0">
+                <input type="checkbox" name="active" value="1" id="active"
+                       {{ old('active', $center->active) ? 'checked' : '' }}
+                       class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                <label for="active" class="text-sm font-medium text-gray-700 cursor-pointer">Centro activo</label>
             </div>
         </div>
 
-        <div>
-            <label class="block text-slate-300 text-sm font-medium mb-1">Dirección</label>
-            <input type="text" name="address" value="{{ old('address', $center->address) }}"
-                class="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
-        </div>
+        {{-- Owner --}}
+        <div class="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+            <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Admin Owner</h2>
+            <p class="text-xs text-gray-400">El owner puede gestionar su centro y crear admins staff.</p>
 
-        <div>
-            <label class="block text-slate-300 text-sm font-medium mb-1">URL del logo</label>
-            <input type="url" name="logo_url" value="{{ old('logo_url', $center->logo_url) }}" id="logo-url"
-                class="w-full bg-slate-700 border border-slate-600 text-white placeholder-slate-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
-            <div id="logo-preview" class="{{ $center->logo_url ? '' : 'hidden' }} mt-2">
-                <img id="logo-img" src="{{ $center->logo_url }}" class="h-12 rounded-lg object-contain bg-slate-700 p-1">
-            </div>
-        </div>
-
-        {{-- Owner del centro --}}
-        @if($center->admins->isNotEmpty())
-        <div>
-            <label class="block text-slate-300 text-sm font-medium mb-1">Admin Owner</label>
             <select name="owner_id"
-                class="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500">
+                    class="w-full rounded-lg border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                 <option value="">— Sin owner asignado —</option>
-                @foreach($center->admins as $admin)
-                <option value="{{ $admin->id }}" {{ old('owner_id', $center->owner_id) == $admin->id ? 'selected' : '' }}>
-                    {{ $admin->name }} — {{ $admin->email }}
-                </option>
+                @foreach($owners as $owner)
+                    <option value="{{ $owner->id }}"
+                        {{ old('owner_id', $center->owner_id) == $owner->id ? 'selected' : '' }}>
+                        {{ $owner->name }} ({{ $owner->email }})
+                    </option>
                 @endforeach
             </select>
-            <p class="text-slate-500 text-xs mt-1">El owner puede editar el centro y gestionar asesores staff.</p>
+            @error('owner_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
         </div>
-        @endif
 
-        <div class="flex items-center justify-between pt-1">
-            <span class="text-slate-300 text-sm font-medium">Centro activo</span>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="hidden" name="active" value="0">
-                <input type="checkbox" name="active" value="1" class="sr-only peer" {{ $center->active ? 'checked' : '' }}>
-                <div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-teal-600 transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition peer-checked:after:translate-x-5"></div>
-            </label>
+        {{-- Logo --}}
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Logo del centro</h2>
+
+            @include('components.image-upload-field', [
+                'label'              => 'Logo del centro',
+                'fileField'          => 'logo_file',
+                'urlField'           => 'logo',
+                'removeField'        => 'remove_logo',
+                'currentUrl'         => $center->getResolvedImageUrl(),
+                'currentExternalUrl' => $center->logo,
+                'hasLocal'           => (bool) $center->logo_path,
+            ])
+
+            @error('logo_file') <p class="text-xs text-red-500 mt-2">{{ $message }}</p> @enderror
+            @error('logo')      <p class="text-xs text-red-500 mt-2">{{ $message }}</p> @enderror
         </div>
-    </div>
 
-    <div class="flex gap-3">
-        <button type="submit"
-            class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white transition"
-            style="background:#0F6E56">
-            Guardar cambios
-        </button>
-        <a href="{{ route('superadmin.centers.show', $center) }}"
-           class="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-300 hover:bg-slate-600 transition">
-            Cancelar
-        </a>
-    </div>
-</div>
-</form>
-</div>
+        {{-- Actions --}}
+        <div class="flex items-center justify-end gap-3">
+            <a href="{{ route('superadmin.centers.show', $center) }}"
+               class="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                Cancelar
+            </a>
+            <button type="submit"
+                    class="px-5 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+                Guardar cambios
+            </button>
+        </div>
 
-@push('scripts')
-<script>
-document.getElementById('logo-url').addEventListener('input', function() {
-    const preview = document.getElementById('logo-preview');
-    const img = document.getElementById('logo-img');
-    if (this.value) { img.src = this.value; preview.classList.remove('hidden'); }
-    else { preview.classList.add('hidden'); }
-});
-</script>
-@endpush
+    </form>
+</div>
 @endsection
