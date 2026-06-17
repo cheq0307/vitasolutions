@@ -17,12 +17,11 @@ class ProductoController extends Controller
     public function index()
     {
         $centerId = Auth::user()->center_id;
+        $productos = Product::forCenter($centerId)
+        ->orderBy('name')
+        ->paginate(15);
 
-        $products = Product::forCenter($centerId)
-                           ->orderBy('name')
-                           ->paginate(15);
-
-        return view('admin.productos.index', compact('products'));
+        return view('admin.productos.index', compact('productos'));
     }
 
     // ─── Create ──────────────────────────────────────────────────────────────
