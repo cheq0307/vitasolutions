@@ -76,15 +76,24 @@
                         @error('price') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="flex items-end pb-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" name="is_active" value="1"
-                                   {{ old('is_active', '1') == '1' ? 'checked' : '' }}
-                                   class="w-4 h-4 accent-green-500">
-                            <span class="text-slate-300 text-sm">Activo</span>
-                        </label>
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-1">Stock (unidades)</label>
+                        <input type="number" name="stock" value="{{ old('stock', 0) }}"
+                               min="0" step="1"
+                               class="w-full bg-slate-800 text-slate-100 rounded-lg px-4 py-2 border border-slate-700 focus:outline-none focus:border-green-500 text-sm"
+                               placeholder="0">
+                        @error('stock') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                     </div>
+                </div>
+
+                <div class="flex items-end pb-1">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
+                        <input type="checkbox" name="is_active" value="1"
+                               {{ old('is_active', '1') == '1' ? 'checked' : '' }}
+                               class="w-4 h-4 accent-green-500">
+                        <span class="text-slate-300 text-sm">Activo</span>
+                    </label>
                 </div>
             </div>
 

@@ -53,6 +53,7 @@ class ProductoController extends Controller
             'image_url'   => 'nullable|url|max:500',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_active'   => 'boolean',
+            'stock'       => 'nullable|integer|min:0',
         ]);
 
         $data['center_id'] = Auth::user()->center_id;
@@ -104,6 +105,7 @@ class ProductoController extends Controller
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'remove_image'=> 'boolean',
             'is_active'   => 'boolean',
+            'stock'       => 'nullable|integer|min:0',
         ]);
 
         $data['active'] = $request->boolean('is_active');

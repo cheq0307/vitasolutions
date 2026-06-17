@@ -20,6 +20,7 @@ class Product extends Model
         'image_path',   // ← nuevo: ruta local
         'active',
         'is_suggested',
+        'stock',
     ];
 
     protected $casts = [
