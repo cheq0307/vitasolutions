@@ -49,7 +49,7 @@
         #sidebar { transition: transform 0.25s ease; }
         #sidebar-overlay { transition: opacity 0.25s ease; }
 
-        .flash-banner { animation: flashFade 4s ease forwards; }
+        .flash-banner { animation: flashFade 10s ease forwards; }
         @keyframes flashFade {
             0%   { opacity: 1; transform: translateY(0); }
             80%  { opacity: 1; transform: translateY(0); }
