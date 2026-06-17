@@ -90,10 +90,10 @@
             @include('components.image-upload-field', [
                 'label'              => 'Logo del centro',
                 'fileField'          => 'logo_file',
-                'urlField'           => 'logo',
+                'urlField'           => 'logo_url',
                 'removeField'        => 'remove_logo',
                 'currentUrl'         => $center->getResolvedImageUrl(),
-                'currentExternalUrl' => $center->logo,
+                'currentExternalUrl' => $center->logo_url,
                 'hasLocal'           => (bool) $center->logo_path,
             ])
 

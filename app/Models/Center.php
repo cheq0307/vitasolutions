@@ -14,7 +14,7 @@ class Center extends Model
         'address',
         'phone',
         'email',
-        'logo',         // URL externa (legacy)
+        'logo_url',         // URL externa (legacy)
         'logo_path',    // ← nuevo: ruta local
         'owner_id',
         'active',

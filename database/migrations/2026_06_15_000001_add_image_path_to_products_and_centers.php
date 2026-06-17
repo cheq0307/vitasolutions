@@ -16,7 +16,7 @@ return new class extends Migration
 
         // Centros: agregar logo_path para almacenamiento local
         Schema::table('centers', function (Blueprint $table) {
-            $table->string('logo_path')->nullable()->after('logo');
+            $table->string('logo_path')->nullable()->after('logo_url');
         });
     }
 
