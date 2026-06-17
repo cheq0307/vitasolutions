@@ -24,9 +24,8 @@ class Center extends Model
         'active' => 'boolean',
     ];
 
-    // Override de los campos del trait para que use logo_path / logo
-    protected string $imagePathField = 'logo_path';
-    protected string $imageUrlField  = 'logo';
+    protected function imagePathField(): string { return 'logo_path'; }
+    protected function imageUrlField(): string  { return 'logo_url'; }
 
     // ─── Relaciones ──────────────────────────────────────────────────────────
 
