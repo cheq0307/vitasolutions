@@ -21,14 +21,24 @@
             <div class="space-y-4">
                 <p class="text-slate-400 text-xs font-semibold uppercase tracking-wide">Información básica</p>
 
-                <div>
-                    <label class="block text-slate-300 text-sm mb-1">
-                        Nombre <span class="text-red-400">*</span>
-                    </label>
-                    <input type="text" name="name" value="{{ old('name') }}" required
-                           class="w-full bg-slate-800 text-slate-100 rounded-lg px-4 py-2 border border-slate-700 focus:outline-none focus:border-green-500 text-sm"
-                           placeholder="Ej. Whey Protein Gold Standard">
-                    @error('name') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-1">SKU</label>
+                        <input type="text" name="sku" value="{{ old('sku') }}"
+                               class="w-full bg-slate-800 text-slate-100 rounded-lg px-4 py-2 border border-slate-700 focus:outline-none focus:border-green-500 text-sm uppercase"
+                               placeholder="Ej. SUP-001">
+                        @error('sku') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-1">
+                            Nombre <span class="text-red-400">*</span>
+                        </label>
+                        <input type="text" name="name" value="{{ old('name') }}" required
+                               class="w-full bg-slate-800 text-slate-100 rounded-lg px-4 py-2 border border-slate-700 focus:outline-none focus:border-green-500 text-sm"
+                               placeholder="Ej. Whey Protein Gold Standard">
+                        @error('name') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -63,7 +73,7 @@
                     @error('description') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-slate-300 text-sm mb-1">Precio (MXN)</label>
                         <div class="relative">
@@ -74,6 +84,18 @@
                                    placeholder="0.00">
                         </div>
                         @error('price') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-1">Costo (MXN)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-3 flex items-center text-slate-500 text-sm">$</span>
+                            <input type="number" name="cost" value="{{ old('cost') }}"
+                                   step="0.01" min="0"
+                                   class="w-full pl-7 bg-slate-800 text-slate-100 rounded-lg px-4 py-2 border border-slate-700 focus:outline-none focus:border-green-500 text-sm"
+                                   placeholder="0.00">
+                        </div>
+                        @error('cost') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>

@@ -45,11 +45,13 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'sku'         => 'nullable|string|max:50|unique:products,sku',
             'name'        => 'required|string|max:150',
             'brand'       => 'nullable|string|max:100',
             'category'    => 'nullable|string|max:100',
             'description' => 'nullable|string|max:1000',
             'price'       => 'nullable|numeric|min:0',
+            'cost'        => 'nullable|numeric|min:0',
             'image_url'   => 'nullable|url|max:500',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_active'   => 'boolean',
@@ -96,11 +98,13 @@ class ProductoController extends Controller
         $this->authorizeCenter($producto);
 
         $data = $request->validate([
+            'sku'         => 'nullable|string|max:50|unique:products,sku,' . $producto->id,
             'name'        => 'required|string|max:150',
             'brand'       => 'nullable|string|max:100',
             'category'    => 'nullable|string|max:100',
             'description' => 'nullable|string|max:1000',
             'price'       => 'nullable|numeric|min:0',
+            'cost'        => 'nullable|numeric|min:0',
             'image_url'   => 'nullable|url|max:500',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'remove_image'=> 'boolean',

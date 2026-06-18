@@ -11,13 +11,15 @@ class Product extends Model
 
     protected $fillable = [
         'center_id',
+        'sku',
         'name',
         'brand',
         'category',
         'description',
         'price',
+        'cost',
         'image_url',
-        'image_path',   // ← nuevo: ruta local
+        'image_path',
         'active',
         'is_suggested',
         'stock',
@@ -60,5 +62,25 @@ class Product extends Model
     public function scopeSuggested($query)
     {
         return $query->where('is_suggested', true);
+    }
+
+    // ─── Accessors ──────────────────────────────────────────────────────────
+
+    public function getGainAttribute()
+    {
+        if (!$this->cost || !$this->price) {
+            return 0;
+        }
+        return $this->price - $this->cost;
+    }
+
+    public function getStockStatusAttribute()
+    {
+        if ($this->stock === 0) {
+            return 'agotado';
+        } elseif ($this->stock <= 5) {
+            return 'bajo';
+        }
+        return 'disponible';
     }
 }
