@@ -41,6 +41,26 @@ class User extends Authenticatable
         return $this->hasMany(ClientPlan::class);
     }
 
+    public function userProtocols(): HasMany
+    {
+        return $this->hasMany(UserProtocol::class);
+    }
+
+    public function deviceReadings(): HasMany
+    {
+        return $this->hasMany(DeviceReading::class);
+    }
+
+    public function wellnessSurveys(): HasMany
+    {
+        return $this->hasMany(WellnessSurvey::class);
+    }
+
+    public function healthFiles(): HasMany
+    {
+        return $this->hasMany(HealthFile::class);
+    }
+
     // ── Helpers de rol ──────────────────────────────────────────────────────
 
     public function isSuperAdmin(): bool

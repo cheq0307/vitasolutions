@@ -130,7 +130,7 @@
                 <h3 class="text-sm font-semibold text-white">Protocolos activos</h3>
             </div>
             <div class="divide-y divide-slate-800 max-h-60 overflow-y-auto">
-                @forelse($cliente->protocols->where('status', 'active') as $protocol)
+                @forelse($cliente->userProtocols->where('status', 'active') as $protocol)
                 <div class="px-4 md:px-6 py-3 md:py-4">
                     <p class="text-sm font-medium text-white">{{ $protocol->product->name }}</p>
                     <p class="text-xs text-slate-500 mt-0.5">{{ $protocol->dose }} — {{ $protocol->frequency }}</p>
