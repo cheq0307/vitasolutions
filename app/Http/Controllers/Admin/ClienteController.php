@@ -46,10 +46,10 @@ class ClienteController extends Controller
     }
 
     public function show(User $cliente)
-{
-    $cliente->load('healthProfile');
-    return view('admin.clientes.show', compact('cliente'));
-}
+    {
+        $cliente->load('healthProfile', 'userProtocols', 'wellnessSurveys', 'deviceReadings', 'healthFiles');
+        return view('admin.clientes.show', compact('cliente'));
+    }
 
     public function edit(User $cliente)
     {
@@ -111,9 +111,21 @@ class ClienteController extends Controller
             ->with('success', 'Perfil de salud actualizado.');
     }
 
-    public function salud(User $cliente)     { return view('admin.clientes.show', compact('cliente')); }
-    public function mediciones(User $cliente){ return view('admin.clientes.show', compact('cliente')); }
-    public function archivos(User $cliente)  { return view('admin.clientes.show', compact('cliente')); }
-    public function protocolos(User $cliente){ return view('admin.clientes.show', compact('cliente')); }
+    public function salud(User $cliente)     { 
+        $cliente->load('healthProfile', 'userProtocols', 'wellnessSurveys', 'deviceReadings', 'healthFiles');
+        return view('admin.clientes.show', compact('cliente')); 
+    }
+    public function mediciones(User $cliente){ 
+        $cliente->load('healthProfile', 'userProtocols', 'wellnessSurveys', 'deviceReadings', 'healthFiles');
+        return view('admin.clientes.show', compact('cliente')); 
+    }
+    public function archivos(User $cliente)  { 
+        $cliente->load('healthProfile', 'userProtocols', 'wellnessSurveys', 'deviceReadings', 'healthFiles');
+        return view('admin.clientes.show', compact('cliente')); 
+    }
+    public function protocolos(User $cliente){ 
+        $cliente->load('healthProfile', 'userProtocols', 'wellnessSurveys', 'deviceReadings', 'healthFiles');
+        return view('admin.clientes.show', compact('cliente')); 
+    }
     public function asignarProtocolo(Request $request, User $cliente) {}
 }
