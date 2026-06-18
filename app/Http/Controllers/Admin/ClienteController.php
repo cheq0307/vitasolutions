@@ -46,10 +46,10 @@ class ClienteController extends Controller
     }
 
     public function show(User $cliente)
-    {
-        $cliente->load('healthProfile', 'deviceReadings', 'protocols.product', 'healthFiles');
-        return view('admin.clientes.show', compact('cliente'));
-    }
+{
+    $cliente->load('healthProfile');
+    return view('admin.clientes.show', compact('cliente'));
+}
 
     public function edit(User $cliente)
     {
