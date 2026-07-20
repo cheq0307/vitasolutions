@@ -53,7 +53,7 @@
             </div>
             <div class="p-4 md:p-6">
                 @if($cliente->healthProfile)
-                    <div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                         <div>
                             <p class="text-xs text-slate-500 mb-1">Tipo de sangre</p>
                             <p class="text-sm text-white font-medium">{{ $cliente->healthProfile->blood_type ?? '—' }}</p>
@@ -82,15 +82,15 @@
                                 @endif
                             </p>
                         </div>
-                        <div class="col-span-1 xs:col-span-2 md:col-span-3">
+                        <div class="col-span-1 sm:col-span-2 md:col-span-3">
                             <p class="text-xs text-slate-500 mb-1">Alergias</p>
                             <p class="text-sm text-white">{{ $cliente->healthProfile->allergies ?? '—' }}</p>
                         </div>
-                        <div class="col-span-1 xs:col-span-2 md:col-span-3">
+                        <div class="col-span-1 sm:col-span-2 md:col-span-3">
                             <p class="text-xs text-slate-500 mb-1">Padecimientos crónicos</p>
                             <p class="text-sm text-white">{{ $cliente->healthProfile->chronic_conditions ?? '—' }}</p>
                         </div>
-                        <div class="col-span-1 xs:col-span-2 md:col-span-3">
+                        <div class="col-span-1 sm:col-span-2 md:col-span-3">
                             <p class="text-xs text-slate-500 mb-1">Medicamentos actuales</p>
                             <p class="text-sm text-white">{{ $cliente->healthProfile->current_medications ?? '—' }}</p>
                         </div>

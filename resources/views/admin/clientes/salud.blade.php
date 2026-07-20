@@ -5,7 +5,7 @@
 @section('page-subtitle', $cliente->name)
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-0 space-y-6">
 
     {{-- Volver --}}
     <a href="{{ route('admin.clientes.show', $cliente) }}"

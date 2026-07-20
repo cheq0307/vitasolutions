@@ -4,7 +4,7 @@
 @section('subtitle', \App\Models\Plan::$types[$plan->type] . ' — ' . ($plan->active ? 'Activo' : 'Inactivo'))
 
 @section('content')
-<div class="max-w-4xl space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-0 space-y-6">
 
     {{-- Header actions --}}
     <div class="flex items-center gap-3 justify-end">

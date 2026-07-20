@@ -4,7 +4,7 @@
 @section('subtitle', 'Agrega un suplemento al catálogo del centro')
 
 @section('content')
-<div class="max-w-2xl">
+<div class="max-w-2xl mx-auto px-4 sm:px-0">
     <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
 
         @if($errors->any())

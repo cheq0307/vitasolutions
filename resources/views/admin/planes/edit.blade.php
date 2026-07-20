@@ -4,7 +4,7 @@
 @section('subtitle', $plan->name)
 
 @section('content')
-<div class="max-w-4xl">
+<div class="max-w-4xl mx-auto px-4 sm:px-0">
 <form method="POST" action="{{ route('admin.planes.update', $plan) }}" id="plan-form">
 @csrf @method('PUT')
 

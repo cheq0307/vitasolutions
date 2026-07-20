@@ -31,23 +31,53 @@
     @livewireStyles
 
     <style>
-        body { font-family: 'DM Sans', sans-serif; }
+        :root {
+            color-scheme: dark;
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.65;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            background: #020617;
+            color: #f8fafc;
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 17px;
+            background-color: #020617;
+            color: #e2e8f0;
+        }
+        button, input, textarea, select, a {
+            font-family: inherit;
+            font-size: inherit;
+        }
         .sidebar-link {
             display: flex; align-items: center; gap: 12px;
-            padding: 10px 16px; border-radius: 8px;
-            font-size: 14px; font-weight: 500;
+            padding: 14px 16px; border-radius: 10px;
+            font-size: 15px; font-weight: 500;
             color: #94a3b8; transition: all 0.15s;
             text-decoration: none;
         }
         .sidebar-link:hover { background: #1e293b; color: #fff; }
         .sidebar-link.active { background: #0F6E56; color: #fff; }
         .sidebar-section {
-            font-size: 11px; font-weight: 600; color: #475569;
-            text-transform: uppercase; letter-spacing: 0.1em;
+            font-size: 12px; font-weight: 600; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 0.14em;
             padding: 0 16px; margin: 24px 0 8px;
         }
         #sidebar { transition: transform 0.25s ease; }
         #sidebar-overlay { transition: opacity 0.25s ease; }
+        header { transition: transform 0.3s ease; }
+        header.hidden { transform: translateY(-100%); }
+        footer { transition: transform 0.3s ease; }
+        footer.hidden { transform: translateY(100%); }
+        main { min-height: calc(100dvh - 130px); }
 
         .flash-banner { animation: flashFade 10s ease forwards; }
         @keyframes flashFade {
@@ -67,7 +97,7 @@
 
         input::placeholder,
         textarea::placeholder {
-            color: #475569 !important;
+            color: #94a3b8 !important;
         }
 
         input:focus:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
@@ -378,6 +408,10 @@
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+        let lastScrollTop = 0;
+        let isScrolling = false;
 
         function openSidebar() {
             sidebar.classList.remove('-translate-x-full');
@@ -401,6 +435,26 @@
                 if (window.innerWidth < 1024) closeSidebar();
             });
         });
+
+        // Hide/Show header y footer al desplazarse (solo en mobile)
+        document.addEventListener('scroll', () => {
+            if (window.innerWidth >= 1024) return; // Solo en mobile
+
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const isScrollingDown = scrollTop > lastScrollTop;
+
+            if (isScrollingDown && scrollTop > 100) {
+                // Desplazarse hacia abajo
+                header.classList.add('hidden');
+                footer.classList.add('hidden');
+            } else {
+                // Desplazarse hacia arriba
+                header.classList.remove('hidden');
+                footer.classList.remove('hidden');
+            }
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
     </script>
 </body>
 </html>

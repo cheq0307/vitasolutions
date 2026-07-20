@@ -4,7 +4,7 @@
 @section('subtitle', 'Crea un plan mensual, personalizado o por visita')
 
 @section('content')
-<div class="max-w-4xl">
+<div class="max-w-4xl mx-auto px-4 sm:px-0">
 <form method="POST" action="{{ route('admin.planes.store') }}" id="plan-form">
 @csrf
 
